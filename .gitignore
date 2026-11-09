@@ -1,0 +1,14 @@
+# Salida y caché de Hugo
+/public/
+/resources/_gen/
+.hugo_build.lock
+
+# Editores
+*.swp
+*~
+.vscode/
+.idea/
+
+# Nunca subir entradas reales del diario: solo las ficticias de ejemplos/
+/content/*
+!/content/_index.md
