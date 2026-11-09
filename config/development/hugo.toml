@@ -1,0 +1,3 @@
+# Entorno de desarrollo (hugo server).
+# Usa las entradas de prueba de content/entradas/ (montaje por defecto de Hugo).
+baseURL = "http://localhost:1313/"

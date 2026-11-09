@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-label="Paisaje simple">
+  <rect width="640" height="320" fill="#9fc5e8"/>
+  <circle cx="520" cy="80" r="40" fill="#f6c343"/>
+  <path d="M0 240 L160 120 L300 240 L420 150 L640 260 L640 320 L0 320 Z" fill="#5b8c5a"/>
+  <path d="M0 280 Q320 230 640 290 L640 320 L0 320 Z" fill="#3e6b3d"/>
+</svg>
