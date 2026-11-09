@@ -1,0 +1,3 @@
+{{- /* Primeras palabras de la entrada, en texto plano, para la lista. */ -}}
+{{- $html := partialCached "cuerpo.html" . .RelPermalink -}}
+{{- return ($html | plainify | htmlUnescape | strings.TrimSpace | replaceRE `\s+` " " | truncate 140) -}}

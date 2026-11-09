@@ -1,0 +1,22 @@
+{{- $entradas := where site.RegularPages "Section" "entradas" -}}
+{{- if not $entradas }}
+<p class="vacio">Todavía no hay entradas.</p>
+{{- end }}
+{{- range $entradas.GroupByDate "2006" }}
+<section class="anio">
+  <h2>{{ .Key }}</h2>
+  {{- range .Pages.GroupByDate "2006-01" }}
+  <h3 class="mes">{{ (index .Pages 0).Date | time.Format "January" | strings.FirstUpper }}</h3>
+  <ul class="entradas">
+    {{- range .Pages }}
+    <li>
+      <a href="{{ .RelPermalink }}">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "titulo.html" . }}</time>
+        <span class="extracto">{{ partial "extracto.html" . }}</span>
+      </a>
+    </li>
+    {{- end }}
+  </ul>
+  {{- end }}
+</section>
+{{- end }}

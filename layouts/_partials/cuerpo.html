@@ -1,0 +1,11 @@
+{{- /*
+  Las entradas empiezan con la fecha en la primera línea (p. ej. "2026-11-09").
+  Como el título ya muestra la fecha, esa línea se omite si contiene el nombre del archivo.
+  El archivo original no se modifica.
+*/ -}}
+{{- $raw := .RawContent -}}
+{{- $lineas := split $raw "\n" -}}
+{{- if and .File (gt (len $lineas) 0) (strings.Contains (index $lineas 0) .File.ContentBaseName) -}}
+  {{- $raw = delimit (after 1 $lineas) "\n" -}}
+{{- end -}}
+{{- return (.RenderString (dict "display" "block") $raw) -}}
