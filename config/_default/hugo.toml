@@ -1,0 +1,39 @@
+# Configuración común a todos los entornos.
+# Los entornos se eligen con --environment (o -e):
+#   hugo server  -> development  (config/development/)
+#   hugo build   -> production   (config/production/)
+
+baseURL = "https://diario.raspi.lan/"
+title = "Diario"
+locale = "es"
+defaultContentLanguage = "es"
+timeZone = "America/Argentina/Buenos_Aires"
+
+# Solo necesitamos la portada y las entradas.
+disableKinds = ["taxonomy", "term", "rss", "sitemap", "robotsTXT", "404"]
+
+# Archivos temporales de vim (y otros editores) que aparecen junto a las entradas.
+ignoreFiles = ['\.swp$', '\.swx$', '~$', '^\.']
+
+# El HTML crudo dentro del Markdown se omite a propósito (markup.goldmark.renderer.unsafe = false);
+# no hace falta avisarlo en cada build.
+ignoreLogs = ['warning-goldmark-raw-html']
+
+[module]
+  [module.hugoVersion]
+    min = "0.168.0"
+
+# Las entradas no tienen front matter: la fecha sale del nombre del archivo (AAAA-MM-DD.md).
+[frontmatter]
+  date = [":filename", ":default"]
+
+# URL de cada entrada: /2026/11/09/
+[permalinks]
+  [permalinks.page]
+    entradas = "/:year/:month/:day/"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = false          # no se interpreta HTML crudo dentro del Markdown
+  [markup.highlight]
+    noClasses = false       # colores del código con clases CSS (modo claro/oscuro)
