@@ -1,0 +1,10 @@
+[Unit]
+Description=Diario: regenera el sitio al guardar una entrada
+
+[Path]
+# >>> Misma carpeta que en config/production/hugo.toml <<<
+PathChanged=/home/weasel/Documentos/dp
+Unit=diario-build.service
+
+[Install]
+WantedBy=multi-user.target

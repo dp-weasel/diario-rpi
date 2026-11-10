@@ -39,6 +39,43 @@ hugo build -e development --panicOnWarning   # comprobar que compila sin avisos
 En producción, las entradas de prueba no se incluyen: solo se toman las portadas
 (`_index.md`) del repositorio y las entradas reales de la carpeta configurada.
 
+## Despliegue en la Raspberry
+
+Se despliega lo que está en `master` de GitHub. Desde el PC:
+
+```bash
+./scripts/deploy.sh
+```
+
+El script entra por `ssh rpi`, clona o actualiza el repo en `/opt/diario-rpi` y ejecuta
+`scripts/install.sh` (idempotente), que:
+
+1. crea `/var/www/diario` (dueño `weasel`, grupo `www-data`, sin acceso para otros);
+2. instala `diario-build.service` y `diario-build.path` en systemd;
+3. genera el sitio (`scripts/build.sh`: build en carpeta temporal y luego `rsync`,
+   así un build fallido no rompe el sitio publicado);
+4. instala y activa el vhost de Apache `diario.raspi.lan`.
+
+Después, cada vez que se guarda una entrada en la carpeta del diario,
+`diario-build.path` lo detecta y regenera el sitio.
+
+**Contraseña** (una sola vez, en la Raspberry; no se guarda en el repo):
+
+```bash
+sudo htpasswd -c /etc/apache2/diario.htpasswd weasel
+```
+
+**Si cambia la carpeta del diario**, actualizarla en dos sitios:
+`config/production/hugo.toml` (montaje) y `deploy/systemd/diario-build.path` (`PathChanged`).
+
+Comandos útiles en la Raspberry:
+
+```bash
+systemctl status diario-build.path            # ¿está vigilando la carpeta?
+journalctl -u diario-build.service -n 20      # últimos builds
+sudo systemctl start diario-build.service     # regenerar a mano
+```
+
 ## Estructura
 
 ```
@@ -47,6 +84,8 @@ content/      portadas y entradas de prueba
 layouts/      plantillas (sin tema externo)
 assets/css/   estilos (modo claro/oscuro) y resaltado de código
 static/       archivos estáticos (imagen de prueba)
+deploy/       vhost de Apache y unidades de systemd
+scripts/      build.sh, install.sh (Raspberry) y deploy.sh (PC)
 ```
 
 ## Licencia
