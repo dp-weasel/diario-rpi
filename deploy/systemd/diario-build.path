@@ -2,7 +2,7 @@
 Description=Diario: regenera el sitio al guardar una entrada
 
 [Path]
-# >>> Misma carpeta que en config/production/hugo.toml <<<
+# >>> Misma carpeta que en config/production/module.toml <<<
 PathChanged=/home/weasel/Documentos/dp
 Unit=diario-build.service
 
