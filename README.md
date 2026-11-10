@@ -36,12 +36,13 @@ Las entradas **no** son contenido de Hugo: se montan como archivos crudos en
 convierte en páginas normales (título, fecha, etiquetas y texto). Así el tema
 funciona sin modificarlo.
 
-Del tema solo se sobrescriben dos archivos, en `layouts/`:
+Del tema solo se sobrescriben tres archivos, en `layouts/`:
 
 | Archivo | Cambio respecto a PaperMod |
 |---|---|
 | `_partials/post_nav_links.html` | "Anterior" = día anterior y "Siguiente" = día siguiente (el tema lo hace al revés) |
 | `index.json` | El índice de búsqueda incluye las etiquetas |
+| `_partials/post_meta.html` | Vacío: sin la línea "fecha · tiempo de lectura" (el título ya es la fecha). Junto con `params.hideMeta` |
 
 ## Requisitos
 
@@ -53,6 +54,9 @@ git clone --recurse-submodules https://github.com/dp-weasel/diario-rpi.git
 # o, en un clon existente:
 git submodule update --init
 ```
+
+El submódulo está marcado como `shallow`: se descarga solo el commit fijado, sin el
+historial del tema.
 
 ## Desarrollo
 
@@ -124,7 +128,7 @@ config/                    configuración por entorno
 content/                   portada, búsqueda, archivo, etiquetas
 content/entradas/_content.gotmpl   content adapter: entradas -> páginas
 diario-ejemplo/            entradas de prueba (desarrollo)
-layouts/                   las dos plantillas que sobrescriben al tema
+layouts/                   las tres plantillas que sobrescriben al tema
 static/                    archivos estáticos (imagen de prueba)
 themes/PaperMod/           tema (submódulo de git)
 deploy/                    vhost de Apache y unidades de systemd
