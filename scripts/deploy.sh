@@ -21,11 +21,15 @@ set -euo pipefail
 if [ ! -d "$DIR/.git" ]; then
   echo "==> Primera instalación: clonando en $DIR"
   sudo install -d -o "\$(id -un)" -g "\$(id -gn)" "$DIR"
-  git clone --quiet --branch master "$REPO_URL" "$DIR"
+  git clone --quiet --recurse-submodules --shallow-submodules --branch master "$REPO_URL" "$DIR"
 else
   echo "==> Actualizando $DIR"
   git -C "$DIR" pull --ff-only --quiet origin master
 fi
+# Tema PaperMod (submódulo): se fija a la versión registrada en el repo.
+# --depth 1: solo ese commit, sin el historial del tema (~1 s en vez de minutos).
+git -C "$DIR" submodule update --init --recursive --depth 1 --quiet
+echo "Tema:    \$(git -C "$DIR/themes/PaperMod" log -1 --format='PaperMod %h (%cs)')"
 echo "Versión: \$(git -C "$DIR" log -1 --format='%h %s')"
 "$DIR/scripts/install.sh"
 REMOTO

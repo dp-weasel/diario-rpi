@@ -1,0 +1,14 @@
+# Montajes en desarrollo. Al definir montajes se reemplazan los de Hugo por defecto,
+# así que se declaran todos los que usa el proyecto.
+[[mounts]]
+  source = "content"
+  target = "content"
+[[mounts]]
+  source = "assets"
+  target = "assets"
+[[mounts]]
+  source = "static"
+  target = "static"
+[[mounts]]
+  source = "diario-ejemplo"     # entradas de PRUEBA del repositorio
+  target = "assets/diario"

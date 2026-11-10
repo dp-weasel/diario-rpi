@@ -1,0 +1,23 @@
+{{- /*
+  Sobrescribe themes/PaperMod/layouts/_partials/post_nav_links.html.
+  Cambio: en el tema, "« Anterior" lleva a la entrada MÁS NUEVA. En un diario,
+  "Anterior" es el día de antes y "Siguiente" el de después, así que se invierten
+  $pages.Next / $pages.Prev. El resto es igual al original.
+*/ -}}
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- if and (gt (len $pages) 1) (in $pages . ) }}
+<nav class="paginav">
+  {{- with $pages.Prev . }}
+  <a class="prev" href="{{ .Permalink }}">
+    <span class="title">« {{ i18n "prev_page" }}</span>
+    <span>{{- .Name -}}</span>
+  </a>
+  {{- end }}
+  {{- with $pages.Next . }}
+  <a class="next" href="{{ .Permalink }}">
+    <span class="title">{{ i18n "next_page" }} »</span>
+    <span>{{- .Name -}}</span>
+  </a>
+  {{- end }}
+</nav>
+{{- end }}

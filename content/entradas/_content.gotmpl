@@ -1,0 +1,58 @@
+{{- /*
+  Content adapter: convierte cada entrada del diario en una página de Hugo.
+
+  Las entradas se montan como archivos crudos en assets/diario/ (ver config/<entorno>/module.toml)
+  y tienen este formato, sin front matter:
+
+      2026-11-09                      <- 1.ª línea: la fecha (se omite si contiene la del nombre)
+      Texto de la entrada en Markdown...
+
+      Etiquetas: trabajo, familia     <- opcional: última línea no vacía (se extrae y no se muestra)
+
+  - Nombre del archivo: AAAA-MM-DD.md. Otros archivos se ignoran con un aviso.
+  - Título: la fecha en español ("Lunes, 9 de noviembre de 2026").
+  - Etiquetas: separadas por comas, se guardan en minúsculas.
+  Los archivos originales no se modifican.
+*/ -}}
+
+{{- range resources.Match "diario/*.md" -}}
+  {{- $nombre := path.BaseName .Name -}}
+
+  {{- if not (findRE `^\d{4}-\d{2}-\d{2}$` $nombre) -}}
+    {{- warnf "Diario: se ignora %q (el nombre debe ser AAAA-MM-DD.md)" .Name -}}
+    {{- continue -}}
+  {{- end -}}
+
+  {{- $fecha := time.AsTime $nombre -}}
+  {{- $lineas := split (replace .Content "\r" "") "\n" -}}
+
+  {{- /* 1. Primera línea: la fecha. */ -}}
+  {{- if and $lineas (strings.Contains (index $lineas 0) $nombre) -}}
+    {{- $lineas = after 1 $lineas -}}
+  {{- end -}}
+
+  {{- /* 2. Etiquetas: la última línea no vacía, si empieza con "Etiquetas:". */ -}}
+  {{- $etiquetas := slice -}}
+  {{- $ultima := -1 -}}
+  {{- range $i, $linea := $lineas -}}
+    {{- if strings.TrimSpace $linea -}}{{- $ultima = $i -}}{{- end -}}
+  {{- end -}}
+  {{- if ge $ultima 0 -}}
+    {{- with findRESubmatch `(?i)^\s*etiquetas\s*:\s*(.*?)\s*$` (index $lineas $ultima) 1 -}}
+      {{- range split (index (index . 0) 1) "," -}}
+        {{- with strings.TrimSpace . -}}
+          {{- $etiquetas = $etiquetas | append (lower .) -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $lineas = first $ultima $lineas -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $.AddPage (dict
+      "path"    $nombre
+      "title"   ($fecha | time.Format ":date_full" | strings.FirstUpper)
+      "dates"   (dict "date" $fecha)
+      "params"  (dict "tags" ($etiquetas | uniq))
+      "content" (dict "mediaType" "text/markdown" "value" (delimit $lineas "\n"))
+  ) -}}
+{{- end -}}

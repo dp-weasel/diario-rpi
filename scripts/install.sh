@@ -16,6 +16,7 @@ paso() { printf '\n==> %s\n' "$*"; }
 paso "Comprobando requisitos"
 command -v hugo  >/dev/null || { echo "Falta hugo (versión $HUGO_MIN)"; exit 1; }
 command -v rsync >/dev/null || { echo "Falta rsync"; exit 1; }
+[ -f "$REPO/themes/PaperMod/theme.toml" ] || { echo "Falta el tema: git submodule update --init"; exit 1; }
 hugo version
 
 paso "Carpeta del sitio: $DESTINO (dueño $USUARIO, grupo www-data, sin acceso para otros)"

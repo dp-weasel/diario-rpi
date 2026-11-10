@@ -1,0 +1,18 @@
+# Entorno de producción (hugo build en la Raspberry).
+#
+# >>> RUTA DE LAS ENTRADAS DEL DIARIO <<<
+# Cambiar "source" del último montaje si la carpeta del diario se mueve
+# (y también PathChanged en deploy/systemd/diario-build.path).
+
+[[mounts]]
+  source = "content"
+  target = "content"
+[[mounts]]
+  source = "assets"
+  target = "assets"
+[[mounts]]
+  source = "static"
+  target = "static"
+[[mounts]]
+  source = "/home/weasel/Documentos/dp"
+  target = "assets/diario"

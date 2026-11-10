@@ -1,8 +1,0 @@
-{{- /* Título generado desde la fecha (que Hugo toma del nombre del archivo). */ -}}
-{{- $t := "" -}}
-{{- if .Date.IsZero -}}
-  {{- $t = .File.ContentBaseName -}}
-{{- else -}}
-  {{- $t = .Date | time.Format ":date_full" | strings.FirstUpper -}}
-{{- end -}}
-{{- return $t -}}
