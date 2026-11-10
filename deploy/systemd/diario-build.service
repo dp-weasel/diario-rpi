@@ -1,0 +1,21 @@
+[Unit]
+Description=Diario: genera el sitio con Hugo
+Documentation=https://github.com/dp-weasel/diario-rpi
+
+[Service]
+Type=oneshot
+User=weasel
+ExecStart=/opt/diario-rpi/scripts/build.sh
+Nice=10
+
+# Caché de Hugo y carpeta temporal de salida: /var/cache/diario-rpi (la crea systemd)
+CacheDirectory=diario-rpi
+Environment=HUGO_CACHEDIR=/var/cache/diario-rpi/hugo
+
+# Endurecimiento: solo puede escribir en el sitio publicado, el repo y su caché.
+# El diario se lee en solo lectura.
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/www/diario /opt/diario-rpi
+PrivateTmp=yes
+NoNewPrivileges=yes
