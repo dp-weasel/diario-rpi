@@ -2,18 +2,20 @@
 # Los entornos se eligen con --environment (o -e):
 #   hugo server  -> development  (config/development/)
 #   hugo build   -> production   (config/production/)
+#
+# Las entradas del diario NO son contenido de Hugo: se montan como archivos crudos
+# en assets/diario/ (ver config/<entorno>/module.toml) y las convierte en páginas
+# el content adapter content/entradas/_content.gotmpl.
 
 baseURL = "https://diario.raspi.lan/"
 title = "Diario"
+theme = "PaperMod"
 locale = "es"
 defaultContentLanguage = "es"
 timeZone = "America/Argentina/Buenos_Aires"
+enableEmoji = true
 
-# Solo necesitamos la portada y las entradas.
-disableKinds = ["taxonomy", "term", "rss", "sitemap", "robotsTXT", "404"]
-
-# Archivos temporales de vim (y otros editores) que aparecen junto a las entradas.
-ignoreFiles = ['\.swp$', '\.swx$', '~$', '^\.']
+disableKinds = ["rss", "sitemap", "robotsTXT"]
 
 # El HTML crudo dentro del Markdown se omite a propósito (markup.goldmark.renderer.unsafe = false);
 # no hace falta avisarlo en cada build.
@@ -23,17 +25,55 @@ ignoreLogs = ['warning-goldmark-raw-html']
   [module.hugoVersion]
     min = "0.168.0"
 
-# Las entradas no tienen front matter: la fecha sale del nombre del archivo (AAAA-MM-DD.md).
-[frontmatter]
-  date = [":filename", ":default"]
+# Solo etiquetas (sin categorías ni series).
+[taxonomies]
+  tag = "tags"
 
 # URL de cada entrada: /2026/11/09/
 [permalinks]
   [permalinks.page]
     entradas = "/:year/:month/:day/"
 
+# La portada genera además index.json: el índice de la búsqueda.
+[outputs]
+  home = ["HTML", "JSON"]
+
 [markup]
   [markup.goldmark.renderer]
     unsafe = false          # no se interpreta HTML crudo dentro del Markdown
   [markup.highlight]
-    noClasses = false       # colores del código con clases CSS (modo claro/oscuro)
+    noClasses = false       # PaperMod trae sus propios estilos de código
+
+# --- PaperMod --------------------------------------------------------------
+[params]
+  defaultTheme = "auto"         # claro/oscuro según el sistema, con botón para cambiar
+  mainSections = ["entradas"]
+  ShowReadingTime = true
+  ShowPostNavLinks = true
+  ShowCodeCopyButtons = true
+  ShowShareButtons = false
+  ShowBreadCrumbs = false
+  ShowRssButtonInSectionTermList = false
+  disableSpecial1stPost = true
+  ShowAllPagesInArchive = false
+  [params.fuseOpts]             # búsqueda: título, texto y etiquetas
+    isCaseSensitive = false
+    shouldSort = true
+    ignoreLocation = true
+    threshold = 0.3
+    minMatchCharLength = 2
+    keys = ["title", "content", "tags"]
+
+[menus]
+  [[menus.main]]
+    name = "Archivo"
+    pageRef = "/archivo"
+    weight = 10
+  [[menus.main]]
+    name = "Etiquetas"
+    pageRef = "/tags"
+    weight = 20
+  [[menus.main]]
+    name = "Buscar"
+    pageRef = "/buscar"
+    weight = 30

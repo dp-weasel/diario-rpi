@@ -1,0 +1,12 @@
+{{- /*
+  Sobrescribe themes/PaperMod/layouts/index.json (índice de la búsqueda).
+  Cambio: se añaden las etiquetas ("tags") para poder buscar por ellas
+  (ver params.fuseOpts.keys en config/_default/hugo.toml). El resto es igual al original.
+*/ -}}
+{{- $index := slice -}}
+{{- range site.RegularPages -}}
+    {{- if and (not .Params.searchHidden) (ne .Layout `archives`) (ne .Layout `search`) }}
+    {{- $index = $index | append (dict "title" .Title "content" .Plain "permalink" .Permalink "summary" .Summary "tags" (.Params.tags | default slice)) -}}
+    {{- end }}
+{{- end -}}
+{{- $index | jsonify -}}
