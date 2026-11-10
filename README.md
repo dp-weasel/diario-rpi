@@ -1,25 +1,58 @@
 # diario-rpi
 
-Sitio web privado, generado con [Hugo](https://gohugo.io/), para leer un diario
+Sitio web privado, generado con [Hugo](https://gohugo.io/) y el tema
+[PaperMod](https://github.com/adityatelange/hugo-PaperMod), para leer un diario
 personal escrito en Markdown. Se aloja en una Raspberry Pi y se sirve con Apache
 detrás de autenticación.
 
 Las entradas reales del diario no forman parte del repositorio: viven en la
 Raspberry y Hugo las lee en el momento del build. Para desarrollar se usan las
-entradas de prueba de `content/entradas/`, que muestran los distintos elementos
+entradas de prueba de `diario-ejemplo/`, que muestran los distintos elementos
 de Markdown.
 
 ## Formato de las entradas
 
-- Un archivo por día: `AAAA-MM-DD.md`.
-- Sin front matter: la fecha se toma del nombre del archivo y el título se genera
-  a partir de ella, en español ("Lunes, 9 de noviembre de 2026").
-- La primera línea es la fecha. Si contiene la fecha del nombre del archivo, se omite
-  al mostrar la entrada (el archivo no se modifica).
+Un archivo por día, `AAAA-MM-DD.md`, sin front matter:
+
+```markdown
+2026-11-09
+Texto de la entrada en Markdown...
+
+Etiquetas: trabajo, familia
+```
+
+- **Fecha y título:** se toman del nombre del archivo. El título se genera en español
+  ("Lunes, 9 de noviembre de 2026").
+- **Primera línea:** la fecha. Si contiene la fecha del nombre del archivo, se omite al mostrar la entrada.
+- **Etiquetas (opcional):** la última línea no vacía, si empieza con `Etiquetas:`.
+  Separadas por comas; se guardan en minúsculas. La línea no se muestra en el texto.
+- Los archivos originales nunca se modifican. Otros archivos de la carpeta se ignoran
+  (los `.md` con otro nombre, con un aviso en el build).
+
+## Cómo funciona
+
+Las entradas **no** son contenido de Hugo: se montan como archivos crudos en
+`assets/diario/`, y el *content adapter* `content/entradas/_content.gotmpl` las
+convierte en páginas normales (título, fecha, etiquetas y texto). Así el tema
+funciona sin modificarlo.
+
+Del tema solo se sobrescriben dos archivos, en `layouts/`:
+
+| Archivo | Cambio respecto a PaperMod |
+|---|---|
+| `_partials/post_nav_links.html` | "Anterior" = día anterior y "Siguiente" = día siguiente (el tema lo hace al revés) |
+| `index.json` | El índice de búsqueda incluye las etiquetas |
 
 ## Requisitos
 
 - Hugo **v0.168.0** (edición estándar), la misma versión en desarrollo y en producción.
+- El tema es un submódulo de git:
+
+```bash
+git clone --recurse-submodules https://github.com/dp-weasel/diario-rpi.git
+# o, en un clon existente:
+git submodule update --init
+```
 
 ## Desarrollo
 
@@ -32,12 +65,9 @@ hugo build -e development --panicOnWarning   # comprobar que compila sin avisos
 
 | Archivo | Uso |
 |---|---|
-| `config/_default/hugo.toml` | Común: idioma, fechas desde el nombre del archivo, URLs `/AAAA/MM/DD/` |
-| `config/development/hugo.toml` | `hugo server`: usa las entradas de prueba de `content/entradas/` |
-| `config/production/hugo.toml` | `hugo build`: **ruta de la carpeta del diario** en la Raspberry |
-
-En producción, las entradas de prueba no se incluyen: solo se toman las portadas
-(`_index.md`) del repositorio y las entradas reales de la carpeta configurada.
+| `config/_default/hugo.toml` | Común: idioma, tema y sus parámetros, etiquetas, búsqueda, menú, URLs `/AAAA/MM/DD/` |
+| `config/development/module.toml` | `hugo server`: entradas de prueba de `diario-ejemplo/` |
+| `config/production/module.toml` | `hugo build`: **ruta de la carpeta del diario** en la Raspberry |
 
 ## Despliegue en la Raspberry
 
@@ -47,8 +77,8 @@ Se despliega lo que está en `master` de GitHub. Desde el PC:
 ./scripts/deploy.sh
 ```
 
-El script entra por `ssh rpi`, clona o actualiza el repo en `/opt/diario-rpi` y ejecuta
-`scripts/install.sh` (idempotente), que:
+El script entra por `ssh rpi`, clona o actualiza el repo (con el submódulo del tema)
+en `/opt/diario-rpi` y ejecuta `scripts/install.sh` (idempotente), que:
 
 1. crea `/var/www/diario` (dueño `weasel`, grupo `www-data`, sin acceso para otros);
 2. instala `diario-build.service` y `diario-build.path` en systemd;
@@ -66,7 +96,7 @@ sudo htpasswd -c /etc/apache2/diario.htpasswd weasel
 ```
 
 **Si cambia la carpeta del diario**, actualizarla en dos sitios:
-`config/production/hugo.toml` (montaje) y `deploy/systemd/diario-build.path` (`PathChanged`).
+`config/production/module.toml` (montaje) y `deploy/systemd/diario-build.path` (`PathChanged`).
 
 Comandos útiles en la Raspberry:
 
@@ -76,18 +106,31 @@ journalctl -u diario-build.service -n 20      # últimos builds
 sudo systemctl start diario-build.service     # regenerar a mano
 ```
 
+## Actualizar el tema
+
+```bash
+git -C themes/PaperMod fetch && git -C themes/PaperMod checkout <commit-o-tag>
+hugo build -e development --panicOnWarning    # comprobar
+git add themes/PaperMod && git commit -m "Actualizar PaperMod"
+```
+
+Una versión nueva del tema puede requerir una versión más nueva de Hugo
+(ver `min_version` en `themes/PaperMod/theme.toml`) en el PC y en la Raspberry.
+
 ## Estructura
 
 ```
-config/       configuración por entorno
-content/      portadas y entradas de prueba
-layouts/      plantillas (sin tema externo)
-assets/css/   estilos (modo claro/oscuro) y resaltado de código
-static/       archivos estáticos (imagen de prueba)
-deploy/       vhost de Apache y unidades de systemd
-scripts/      build.sh, install.sh (Raspberry) y deploy.sh (PC)
+config/                    configuración por entorno
+content/                   portada, búsqueda, archivo, etiquetas
+content/entradas/_content.gotmpl   content adapter: entradas -> páginas
+diario-ejemplo/            entradas de prueba (desarrollo)
+layouts/                   las dos plantillas que sobrescriben al tema
+static/                    archivos estáticos (imagen de prueba)
+themes/PaperMod/           tema (submódulo de git)
+deploy/                    vhost de Apache y unidades de systemd
+scripts/                   build.sh, install.sh (Raspberry) y deploy.sh (PC)
 ```
 
 ## Licencia
 
-[GPL-3.0](LICENSE)
+[GPL-3.0](LICENSE). El tema PaperMod tiene licencia MIT.
