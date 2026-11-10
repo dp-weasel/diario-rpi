@@ -48,7 +48,8 @@ ignoreLogs = ['warning-goldmark-raw-html']
 [params]
   defaultTheme = "auto"         # claro/oscuro según el sistema, con botón para cambiar
   mainSections = ["entradas"]
-  ShowReadingTime = true
+  ShowReadingTime = false
+  hideMeta = true               # sin la línea "fecha · tiempo de lectura": el título ya es la fecha
   ShowPostNavLinks = true
   ShowCodeCopyButtons = true
   ShowShareButtons = false
