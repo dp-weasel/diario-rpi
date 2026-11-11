@@ -7,7 +7,7 @@
       2026-11-09                      <- 1.ª línea: la fecha (se omite si contiene la del nombre)
       Texto de la entrada en Markdown...
 
-      Etiquetas: trabajo, familia     <- opcional: última línea no vacía (se extrae y no se muestra)
+      Tags: trabajo, familia          <- opcional: última línea no vacía (se extrae y no se muestra)
 
   - Nombre del archivo: AAAA-MM-DD.md. Otros archivos se ignoran con un aviso.
   - Título: la fecha en español ("Lunes, 9 de noviembre de 2026").
@@ -31,14 +31,14 @@
     {{- $lineas = after 1 $lineas -}}
   {{- end -}}
 
-  {{- /* 2. Etiquetas: la última línea no vacía, si empieza con "Etiquetas:". */ -}}
+  {{- /* 2. Etiquetas: la última línea no vacía, si empieza con "Tags:" (también se acepta "Etiquetas:"). */ -}}
   {{- $etiquetas := slice -}}
   {{- $ultima := -1 -}}
   {{- range $i, $linea := $lineas -}}
     {{- if strings.TrimSpace $linea -}}{{- $ultima = $i -}}{{- end -}}
   {{- end -}}
   {{- if ge $ultima 0 -}}
-    {{- with findRESubmatch `(?i)^\s*etiquetas\s*:\s*(.*?)\s*$` (index $lineas $ultima) 1 -}}
+    {{- with findRESubmatch `(?i)^\s*(?:tags|etiquetas)\s*:\s*(.*?)\s*$` (index $lineas $ultima) 1 -}}
       {{- range split (index (index . 0) 1) "," -}}
         {{- with strings.TrimSpace . -}}
           {{- $etiquetas = $etiquetas | append (lower .) -}}

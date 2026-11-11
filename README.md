@@ -18,13 +18,14 @@ Un archivo por día, `AAAA-MM-DD.md`, sin front matter:
 2026-11-09
 Texto de la entrada en Markdown...
 
-Etiquetas: trabajo, familia
+Tags: trabajo, familia
 ```
 
 - **Fecha y título:** se toman del nombre del archivo. El título se genera en español
   ("Lunes, 9 de noviembre de 2026").
 - **Primera línea:** la fecha. Si contiene la fecha del nombre del archivo, se omite al mostrar la entrada.
-- **Etiquetas (opcional):** la última línea no vacía, si empieza con `Etiquetas:`.
+- **Etiquetas (opcional):** la última línea no vacía, si empieza con `Tags:`
+  (también se acepta `Etiquetas:`, la forma anterior).
   Separadas por comas; se guardan en minúsculas. La línea no se muestra en el texto.
 - Los archivos originales nunca se modifican. Otros archivos de la carpeta se ignoran
   (los `.md` con otro nombre, con un aviso en el build).
